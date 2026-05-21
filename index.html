@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>알록달록 어린이 꽃집 🌸</title>
+    <!-- 구글 폰트: 주아(Jua), 개구(Gaegu) 로드 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Jua&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 1. 메인 포털 화면 (진입점) -->
+    <div id="portal-view" class="view active">
+        <div class="portal-container">
+            <header class="portal-header">
+                <span class="portal-badge">🌸 디지털 어린이 교구 🌸</span>
+                <h1 class="portal-title">알록달록 꽃집 놀이</h1>
+                <p class="portal-subtitle">꽃집 사장님이 되어보고, 직접 예쁜 꽃다발을 주문해 보세요!</p>
+            </header>
+            
+            <div class="portal-grid">
+                <!-- 키오스크 카드 -->
+                <div class="portal-card kiosk-card">
+                    <div class="card-icon">🌹</div>
+                    <h2>어린이 주문 키오스크</h2>
+                    <p>좋아하는 꽃과 예쁜 리본을 골라 나만의 꽃다발을 만들어 보아요!</p>
+                    <button id="btn-open-kiosk" class="btn btn-primary btn-large">키오스크 창 열기 ➔</button>
+                </div>
+                
+                <!-- 관리자 카드 -->
+                <div class="portal-card admin-card">
+                    <div class="card-icon">🏪</div>
+                    <h2>선생님 매장 관리자</h2>
+                    <p>아이들이 주문한 꽃다발을 실시간으로 확인하고 준비할 수 있어요!</p>
+                    <button id="btn-open-admin" class="btn btn-secondary btn-large">관리자 창 열기 ➔</button>
+                </div>
+            </div>
+
+            <div class="portal-footer">
+                <button id="btn-open-split" class="btn btn-outline">한 화면에서 같이 보기 (화면 분할)</button>
+                <p class="helper-text">※ 실제 교구 운영 시 "키오스크 창"과 "관리자 창"을 각각 새 창으로 띄우면 2개의 브라우저 모니터로 동시에 놀이를 즐길 수 있습니다.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 키오스크 화면 -->
+    <div id="kiosk-view" class="view">
+        <div class="kiosk-container">
+            <!-- 상단 바 -->
+            <header class="kiosk-header">
+                <div class="shop-logo">🌸 알록달록 꽃가게 🌸</div>
+                <div class="kiosk-instruction">원하는 꽃, 포장지, 리본을 터치해봐요!</div>
+            </header>
+
+            <!-- 메인 플레이 그라운드 -->
+            <div class="kiosk-main">
+                <!-- 왼쪽: 꽃다발 실시간 시각화 (SVG 일러스트레이션) -->
+                <div class="bouquet-display-section">
+                    <div class="display-card">
+                        <div class="bouquet-preview-area">
+                            <!-- 꽃다발 조립되는 가상 레이어 -->
+                            <div class="bouquet-canvas" id="bouquet-canvas">
+                                <!-- 포장지 레이어 -->
+                                <div class="layer-wrap wrapping-layer" id="preview-wrapping">
+                                    <!-- 기본 무포장 상태의 투명/기본가이드 표시 -->
+                                </div>
+                                <!-- 꽃 레이어 (JS로 꽃 요소들이 위치에 맞게 삽입됨) -->
+                                <div class="layer-wrap flowers-layer" id="preview-flowers">
+                                    <div class="empty-bouquet-text">꽃을 골라 담아보세요!</div>
+                                </div>
+                                <!-- 리본 레이어 -->
+                                <div class="layer-wrap ribbon-layer" id="preview-ribbon"></div>
+                            </div>
+                        </div>
+                        <div class="bouquet-counter">
+                            <div class="counter-item">선택한 꽃: <span id="current-flower-count" class="badge">0</span>송이 (최대 5송이)</div>
+                            <div class="price-item">꽃다발 금액: <span id="total-price-value" class="price-accent">0</span>원</div>
+                        </div>
+                        <button id="btn-reset-bouquet" class="btn btn-danger btn-sm">처음부터 다시 만들기 🔄</button>
+                    </div>
+                </div>
+
+                <!-- 오른쪽: 단계별 카테고리 & 선택 영역 -->
+                <div class="selector-section">
+                    <!-- 단계별 네비게이션 탭 -->
+                    <div class="step-tabs">
+                        <button class="step-tab active" data-step="1"><span>1단계</span>꽃 고르기 🌹</button>
+                        <button class="step-tab" data-step="2"><span>2단계</span>포장지 💛</button>
+                        <button class="step-tab" data-step="3"><span>3단계</span>예쁜 리본 🎀</button>
+                    </div>
+
+                    <!-- 탭 컨텐츠 -->
+                    <div class="tab-contents">
+                        <!-- 1단계: 꽃 고르기 -->
+                        <div class="tab-content active" id="step-content-1">
+                            <div class="item-grid">
+                                <div class="select-item" data-type="flower" data-id="rose" data-name="빨간 장미" data-emoji="🌹" data-price="2000">
+                                    <div class="item-emoji">🌹</div>
+                                    <div class="item-name">빨간 장미</div>
+                                    <div class="item-price">2,000원</div>
+                                </div>
+                                <div class="select-item" data-type="flower" data-id="tulip" data-name="노란 튤립" data-emoji="🌷" data-price="1500">
+                                    <div class="item-emoji">🌷</div>
+                                    <div class="item-name">노란 튤립</div>
+                                    <div class="item-price">1,500원</div>
+                                </div>
+                                <div class="select-item" data-type="flower" data-id="sunflower" data-name="해바라기" data-emoji="🌻" data-price="3000">
+                                    <div class="item-emoji">🌻</div>
+                                    <div class="item-name">해바라기</div>
+                                    <div class="item-price">3,000원</div>
+                                </div>
+                                <div class="select-item" data-type="flower" data-id="daisy" data-name="새하얀 데이지" data-emoji="🌼" data-price="1000">
+                                    <div class="item-emoji">🌼</div>
+                                    <div class="item-name">하얀 데이지</div>
+                                    <div class="item-price">1,000원</div>
+                                </div>
+                                <div class="select-item" data-type="flower" data-id="carnation" data-name="분홍 카네이션" data-emoji="🌺" data-price="2500">
+                                    <div class="item-emoji">🌺</div>
+                                    <div class="item-name">분홍 카네이션</div>
+                                    <div class="item-price">2,500원</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2단계: 포장지 고르기 -->
+                        <div class="tab-content" id="step-content-2">
+                            <div class="item-grid">
+                                <div class="select-item active" data-type="wrapping" data-id="none" data-name="포장 없음" data-color="transparent" data-price="0">
+                                    <div class="item-color-preview pattern-none">❌</div>
+                                    <div class="item-name">포장 없음</div>
+                                    <div class="item-price">0원</div>
+                                </div>
+                                <div class="select-item" data-type="wrapping" data-id="pink" data-name="사랑해 핑크" data-color="#ffb6c1" data-price="1000">
+                                    <div class="item-color-preview" style="background-color: #ffb6c1;"></div>
+                                    <div class="item-name">사랑해 핑크</div>
+                                    <div class="item-price">1,000원</div>
+                                </div>
+                                <div class="select-item" data-type="wrapping" data-id="yellow" data-name="개나리 옐로우" data-color="#ffee93" data-price="1000">
+                                    <div class="item-color-preview" style="background-color: #ffee93;"></div>
+                                    <div class="item-name">개나리 옐로우</div>
+                                    <div class="item-price">1,000원</div>
+                                </div>
+                                <div class="select-item" data-type="wrapping" data-id="blue" data-name="맑은 하늘 블루" data-color="#a0c4ff" data-price="1000">
+                                    <div class="item-color-preview" style="background-color: #a0c4ff;"></div>
+                                    <div class="item-name">맑은 하늘 블루</div>
+                                    <div class="item-price">1,000원</div>
+                                </div>
+                                <div class="select-item" data-type="wrapping" data-id="green" data-name="초록 새싹 그린" data-color="#c1f0c8" data-price="1000">
+                                    <div class="item-color-preview" style="background-color: #c1f0c8;"></div>
+                                    <div class="item-name">새싹 그린</div>
+                                    <div class="item-price">1,000원</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3단계: 리본 고르기 -->
+                        <div class="tab-content" id="step-content-3">
+                            <div class="item-grid">
+                                <div class="select-item active" data-type="ribbon" data-id="none" data-name="리본 없음" data-color="transparent" data-price="0">
+                                    <div class="item-color-preview pattern-none">❌</div>
+                                    <div class="item-name">리본 없음</div>
+                                    <div class="item-price">0원</div>
+                                </div>
+                                <div class="select-item" data-type="ribbon" data-id="red" data-name="정열의 빨강" data-color="#ff4d6d" data-price="500">
+                                    <div class="item-color-preview" style="background-color: #ff4d6d; border-radius: 50%;"></div>
+                                    <div class="item-name">정열의 빨강</div>
+                                    <div class="item-price">500원</div>
+                                </div>
+                                <div class="select-item" data-type="ribbon" data-id="pink" data-name="솜사탕 분홍" data-color="#ff85a1" data-price="500">
+                                    <div class="item-color-preview" style="background-color: #ff85a1; border-radius: 50%;"></div>
+                                    <div class="item-name">솜사탕 분홍</div>
+                                    <div class="item-price">500원</div>
+                                </div>
+                                <div class="select-item" data-type="ribbon" data-id="yellow" data-name="노랑 리본" data-color="#ffd166" data-price="500">
+                                    <div class="item-color-preview" style="background-color: #ffd166; border-radius: 50%;"></div>
+                                    <div class="item-name">노랑 리본</div>
+                                    <div class="item-price">500원</div>
+                                </div>
+                                <div class="select-item" data-type="ribbon" data-id="blue" data-name="파란 리본" data-color="#118ab2" data-price="500">
+                                    <div class="item-color-preview" style="background-color: #118ab2; border-radius: 50%;"></div>
+                                    <div class="item-name">파란 리본</div>
+                                    <div class="item-price">500원</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 하단 진행 버튼 및 주문 완료 버튼 -->
+                    <div class="navigation-actions">
+                        <button id="btn-prev-step" class="btn btn-outline btn-large" disabled>이전 단계 ◀</button>
+                        <button id="btn-next-step" class="btn btn-secondary btn-large">다음 단계 ▶</button>
+                        <button id="btn-submit-order" class="btn btn-primary btn-large btn-rainbow hide">다 만들었어요! 주문하기 🚀</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 주문 완료 애니메이션 팝업 -->
+        <div id="order-success-modal" class="modal">
+            <div class="modal-content text-center">
+                <div class="confetti-container" id="confetti-container"></div>
+                <div class="success-icon">💐</div>
+                <h2>주문이 성공적으로 전송되었어요!</h2>
+                <div class="order-ticket">
+                    <p class="ticket-title">주문 번호</p>
+                    <p class="ticket-number" id="success-order-id">101</p>
+                    <p class="ticket-desc" style="margin-bottom: 10px;">선생님(또는 카운터)께 가서 이 번호를 말해주세요!</p>
+                    <div class="ticket-price-box">준비할 금액: <span id="success-order-price" class="ticket-price-value">0</span>원</div>
+                </div>
+                <button id="btn-close-modal" class="btn btn-primary btn-large">새로 만들기 🔄</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. 관리자 화면 -->
+    <div id="admin-view" class="view">
+        <div class="admin-container">
+            <header class="admin-header">
+                <div class="admin-title-area">
+                    <h1>🏪 행복한 꽃가게 주문 카운터</h1>
+                    <span class="pulse-indicator">실시간 연동 중</span>
+                </div>
+                <div class="admin-actions">
+                    <button id="btn-reset-all" class="btn btn-danger btn-sm">전체 주문 초기화 🗑️</button>
+                </div>
+            </header>
+
+            <div class="admin-main">
+                <!-- 왼쪽: 실시간 들어오는 주문 목록 -->
+                <div class="admin-orders-section">
+                    <h2>신규 주문 대기열 (<span id="waiting-count">0</span>건)</h2>
+                    <div class="orders-list" id="orders-list">
+                        <!-- 비었을 때 메시지 -->
+                        <div class="empty-orders" id="empty-orders-msg">
+                            <div class="empty-icon">💤</div>
+                            <p>아직 들어온 주문이 없어요.</p>
+                            <p class="sub">키오스크 창에서 꽃다발을 만들어 주문해 주세요!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 오른쪽: 주문 요약 및 통계 대시보드 -->
+                <div class="admin-stats-section">
+                    <div class="stats-card summary-card">
+                        <h3>오늘의 영업 실적</h3>
+                        <div class="stats-grid">
+                            <div class="stat-box">
+                                <span class="stat-label">총 주문 건수</span>
+                                <span class="stat-value" id="stat-total-orders">0</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-label">완료한 주문</span>
+                                <span class="stat-value" id="stat-completed-orders">0</span>
+                            </div>
+                            <div class="stat-box" style="grid-column: span 2; margin-top: 10px; background: #fff0f3; border-color: var(--color-pink-dark);">
+                                <span class="stat-label" style="color: var(--color-pink-dark); font-weight: bold; font-size: 18px;">오늘 번 돈 (누적 매출)</span>
+                                <span class="stat-value" id="stat-total-sales" style="color: var(--color-pink-dark); font-size: 40px;">0원</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stats-card chart-card">
+                        <h3>가장 인기 있는 꽃 🏆</h3>
+                        <div class="popularity-list" id="flower-popularity-list">
+                            <!-- JS에서 렌더링 -->
+                            <div class="pop-item">🌹 장미: <span class="pop-count">0</span>송이</div>
+                            <div class="pop-item">🌷 튤립: <span class="pop-count">0</span>송이</div>
+                            <div class="pop-item">🌻 해바라기: <span class="pop-count">0</span>송이</div>
+                            <div class="pop-item">🌼 데이지: <span class="pop-count">0</span>송이</div>
+                            <div class="pop-item">🌺 카네이션: <span class="pop-count">0</span>송이</div>
+                        </div>
+                    </div>
+
+                    <div class="stats-card voice-help-card">
+                        <h3>💡 선생님을 위한 교구 활용 팁</h3>
+                        <ul>
+                            <li>화면 왼쪽 아래의 <strong>"키오스크 창 열기"</strong>로 키오스크용 창을 띄워 아이에게 보여주세요.</li>
+                            <li>이 창은 주문 목록만 띄워두고 아이들이 터치하는 태블릿/화면의 주문을 확인해 실시간 꽃다발 조립 놀이를 진행해 주세요.</li>
+                            <li>주문이 들어오면 실로폰 멜로디가 재생되어 직관적인 놀이가 가능합니다.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. 화면 분할(Split) 레이아웃 모드 (개발자 및 모의 테스트용) -->
+    <div id="split-view" class="view">
+        <div class="split-container">
+            <div class="split-pane split-left" id="split-kiosk-container">
+                <div class="split-header-tag">👧 어린이 주문 화면 (Kiosk)</div>
+                <!-- 여기에 Kiosk 뷰 내용이 JS로 동적 렌더링되거나 임베디드됨 -->
+            </div>
+            <div class="split-pane split-right" id="split-admin-container">
+                <div class="split-header-tag">🏪 선생님 관리자 화면 (Admin)</div>
+                <!-- 여기에 Admin 뷰 내용이 JS로 동적 렌더링되거나 임베디드됨 -->
+            </div>
+            <button id="btn-exit-split" class="btn btn-dark btn-sm exit-split-btn">종료 후 포털로 가기 🏠</button>
+        </div>
+    </div>
+
+    <!-- 스크립트 로드 -->
+    <script src="kiosk.js"></script>
+    <script src="admin.js"></script>
+    <script src="portal.js"></script>
+</body>
+</html>
